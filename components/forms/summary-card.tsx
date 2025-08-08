@@ -401,7 +401,7 @@ export function SummaryCard({
                                   </div>
                                   {answer.customText && (
                                     <span className="text-gray-600 italic">
-                                      "{answer.customText}"
+                                      &quot;{answer.customText}&quot;
                                     </span>
                                   )}
                                 </div>

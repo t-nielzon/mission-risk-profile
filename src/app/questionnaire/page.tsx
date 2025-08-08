@@ -18,7 +18,7 @@ export default function QuestionnairePage() {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(0); // 0 = welcome, 1 = mission details, 2+ = questions, final = summary
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [showSidebar, setShowSidebar] = useState(false);
+
 
   const form = useForm<MRPFormData>({
     defaultValues: {
@@ -78,7 +78,7 @@ export default function QuestionnairePage() {
     if (currentQuestion.type === "custom") {
       if (currentQuestion.placeholders.shared && answer.customText) {
         const hazardKey = currentQuestion.placeholders.shared as string;
-        form.setValue(`customHazards.${hazardKey}` as any, {
+        form.setValue(`customHazards.${hazardKey}` as keyof MRPFormData['customHazards'], {
           description: answer.customText,
           riskLevel: answer.sharedAnswer || 0,
         });
