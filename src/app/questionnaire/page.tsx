@@ -19,7 +19,6 @@ export default function QuestionnairePage() {
   const [currentStep, setCurrentStep] = useState(0); // 0 = welcome, 1 = mission details, 2+ = questions, final = summary
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
 
-
   const form = useForm<MRPFormData>({
     defaultValues: {
       missionDetails: {
@@ -59,7 +58,6 @@ export default function QuestionnairePage() {
 
   const handleMissionDetailsNext = () => {
     setCurrentStep(2);
-    setShowSidebar(true);
     setNavigationState((prev) => ({
       ...prev,
       currentStep: 2,
@@ -77,10 +75,14 @@ export default function QuestionnairePage() {
     // handle custom hazards
     if (currentQuestion.type === "custom") {
       if (currentQuestion.placeholders.shared && answer.customText) {
-        const hazardKey = currentQuestion.placeholders.shared as string;
-        form.setValue(`customHazards.${hazardKey}` as keyof MRPFormData['customHazards'], {
-          description: answer.customText,
-          riskLevel: answer.sharedAnswer || 0,
+        const hazardKey = currentQuestion.placeholders.shared;
+        const customHazards = form.getValues("customHazards");
+        form.setValue("customHazards", {
+          ...customHazards,
+          [hazardKey]: {
+            description: answer.customText,
+            riskLevel: answer.sharedAnswer || 0,
+          },
         });
       }
       if (
@@ -141,7 +143,6 @@ export default function QuestionnairePage() {
     } else {
       // go back to mission details
       setCurrentStep(1);
-      setShowSidebar(false);
     }
   };
 

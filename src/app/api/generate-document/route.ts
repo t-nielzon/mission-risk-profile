@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
     });
 
     // return the document as a response
-    return new NextResponse(outputBuffer as Buffer, {
+    return new NextResponse(new Uint8Array(outputBuffer), {
       headers: {
         "Content-Type":
           "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
