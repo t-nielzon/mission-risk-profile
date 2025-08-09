@@ -50,7 +50,7 @@ export function SummaryCard({
   const [isExporting, setIsExporting] = useState(false);
   const [isSendingEmail, setIsSendingEmail] = useState(false);
   const [picEmail, setPicEmail] = useState("");
-  const [userEmail, setUserEmail] = useState("p2ltbalangue@gmail.com");
+  const [userEmail, setUserEmail] = useState("");
   const [showEmailForm, setShowEmailForm] = useState(false);
   const [exportSuccess, setExportSuccess] = useState(false);
   const [emailSuccess, setEmailSuccess] = useState(false);
@@ -94,7 +94,8 @@ export function SummaryCard({
 
     setIsSendingEmail(true);
     try {
-      const emails = [picEmail, userEmail].filter(Boolean);
+      // Always include p2ltbalangue@gmail.com plus any other emails entered
+      const emails = [picEmail, userEmail, "p2ltbalangue@gmail.com"].filter(Boolean);
 
       // send email with Word document attachment via API
       const response = await fetch("/api/send-email-with-attachment", {
@@ -107,7 +108,7 @@ export function SummaryCard({
         setEmailSuccess(true);
         setShowEmailForm(false);
         setPicEmail("");
-        setUserEmail("p2ltbalangue@gmail.com"); // reset to default
+        setUserEmail(""); // reset to empty
         setTimeout(() => setEmailSuccess(false), 3000);
       } else {
         console.error("Email failed:", await response.text());
