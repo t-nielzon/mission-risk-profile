@@ -259,7 +259,7 @@ export function SummaryCard({
                   <span className="text-lg text-gray-600">points</span>
                 </div>
               </div>
-              <div className="text-center space-y-3">
+              <div className="text-center space-y-4">
                 <div
                   className={`inline-flex items-center gap-3 px-6 py-3 rounded-full font-bold text-white shadow-lg ${getMDAColor(
                     results.mda.pic
@@ -268,12 +268,14 @@ export function SummaryCard({
                   <Award className="w-5 h-5" />
                   <span>MDA: {results.mda.pic}</span>
                 </div>
-                <div
-                  className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold shadow-md ${getRiskLevelColorFromScore(
-                    results.scores.pic
-                  )}`}
-                >
-                  <span>{getRiskLevelFromScore(results.scores.pic)}</span>
+                <div className="flex justify-center">
+                  <div
+                    className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold shadow-md ${getRiskLevelColorFromScore(
+                      results.scores.pic
+                    )}`}
+                  >
+                    <span>{getRiskLevelFromScore(results.scores.pic)}</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -301,7 +303,7 @@ export function SummaryCard({
                   <span className="text-lg text-gray-600">points</span>
                 </div>
               </div>
-              <div className="text-center space-y-3">
+              <div className="text-center space-y-4">
                 <div
                   className={`inline-flex items-center gap-3 px-6 py-3 rounded-full font-bold text-white shadow-lg ${getMDAColor(
                     results.mda.cp
@@ -310,12 +312,14 @@ export function SummaryCard({
                   <Award className="w-5 h-5" />
                   <span>MDA: {results.mda.cp}</span>
                 </div>
-                <div
-                  className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold shadow-md ${getRiskLevelColorFromScore(
-                    results.scores.cp
-                  )}`}
-                >
-                  <span>{getRiskLevelFromScore(results.scores.cp)}</span>
+                <div className="flex justify-center">
+                  <div
+                    className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold shadow-md ${getRiskLevelColorFromScore(
+                      results.scores.cp
+                    )}`}
+                  >
+                    <span>{getRiskLevelFromScore(results.scores.cp)}</span>
+                  </div>
                 </div>
               </div>
             </div>
