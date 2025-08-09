@@ -5,7 +5,7 @@ export const questions: QuestionDefinition[] = [
   {
     id: "short_notice",
     category: "mission",
-    question: "Short notice for Mission Change?",
+    question: "Short notice for Mission Change",
     type: "individual",
     options: {
       green: "N/A",
@@ -20,7 +20,7 @@ export const questions: QuestionDefinition[] = [
   {
     id: "unfamiliar_airfield",
     category: "mission",
-    question: "Unfamiliar Airfield?",
+    question: "Unfamiliar Airfield",
     type: "shared",
     options: {
       green: "Both pilots familiar",
@@ -34,7 +34,7 @@ export const questions: QuestionDefinition[] = [
   {
     id: "uncontrolled_field",
     category: "mission",
-    question: "Uncontrolled airfield?",
+    question: "Uncontrolled airfield",
     type: "shared",
     options: {
       green: "N/A",
@@ -61,7 +61,7 @@ export const questions: QuestionDefinition[] = [
   {
     id: "test_flight",
     category: "mission",
-    question: "Test Flight?",
+    question: "Test Flight",
     type: "shared",
     options: {
       green: "N/A",

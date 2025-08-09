@@ -112,3 +112,17 @@ export function getMDAColor(mda: MDALevel): string {
       return "bg-gray-300 text-black";
   }
 }
+
+export function getRiskLevelFromScore(score: number): string {
+  if (score <= 8) return "Low Risk";
+  if (score <= 15) return "Moderate Risk";
+  if (score <= 20) return "High Risk";
+  return "Severe Risk";
+}
+
+export function getRiskLevelColorFromScore(score: number): string {
+  if (score <= 8) return "bg-green-500 text-white";
+  if (score <= 15) return "bg-yellow-500 text-black";
+  if (score <= 20) return "bg-orange-500 text-white";
+  return "bg-red-500 text-white";
+}

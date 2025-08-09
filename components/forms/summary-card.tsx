@@ -11,6 +11,8 @@ import {
   getRiskLevelColor,
   getRiskLevelText,
   getMDAColor,
+  getRiskLevelFromScore,
+  getRiskLevelColorFromScore,
 } from "@/lib/calculations";
 import { questions } from "@/data/questions";
 import {
@@ -205,27 +207,27 @@ export function SummaryCard({
           </CardTitle>
         </CardHeader>
         <CardContent className="p-8">
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-6 gap-6">
             <div className="space-y-2">
               <Label className="text-gray-600 font-medium">Callsign</Label>
-              <p className="text-xl font-bold text-gray-800">
+              <p className="text-lg font-bold text-gray-800">
                 {formData.missionDetails.callsign}
               </p>
             </div>
             <div className="space-y-2">
               <Label className="text-gray-600 font-medium">Aircraft</Label>
-              <p className="text-xl font-bold text-gray-800">
+              <p className="text-lg font-bold text-gray-800">
                 {formData.missionDetails.ac_nr}
               </p>
             </div>
-            <div className="space-y-2">
-              <Label className="text-gray-600 font-medium">PIC</Label>
+            <div className="col-span-2 space-y-2">
+              <Label className="text-gray-600 font-medium">Pilot-in-Command</Label>
               <p className="text-lg font-semibold text-gray-700">
                 {formData.missionDetails.pic_name}
               </p>
             </div>
-            <div className="space-y-2">
-              <Label className="text-gray-600 font-medium">CP</Label>
+            <div className="col-span-2 space-y-2">
+              <Label className="text-gray-600 font-medium">Co-Pilot</Label>
               <p className="text-lg font-semibold text-gray-700">
                 {formData.missionDetails.cp_name}
               </p>
@@ -257,7 +259,7 @@ export function SummaryCard({
                   <span className="text-lg text-gray-600">points</span>
                 </div>
               </div>
-              <div className="text-center">
+              <div className="text-center space-y-3">
                 <div
                   className={`inline-flex items-center gap-3 px-6 py-3 rounded-full font-bold text-white shadow-lg ${getMDAColor(
                     results.mda.pic
@@ -265,6 +267,13 @@ export function SummaryCard({
                 >
                   <Award className="w-5 h-5" />
                   <span>MDA: {results.mda.pic}</span>
+                </div>
+                <div
+                  className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold shadow-md ${getRiskLevelColorFromScore(
+                    results.scores.pic
+                  )}`}
+                >
+                  <span>{getRiskLevelFromScore(results.scores.pic)}</span>
                 </div>
               </div>
             </div>
@@ -292,7 +301,7 @@ export function SummaryCard({
                   <span className="text-lg text-gray-600">points</span>
                 </div>
               </div>
-              <div className="text-center">
+              <div className="text-center space-y-3">
                 <div
                   className={`inline-flex items-center gap-3 px-6 py-3 rounded-full font-bold text-white shadow-lg ${getMDAColor(
                     results.mda.cp
@@ -300,6 +309,13 @@ export function SummaryCard({
                 >
                   <Award className="w-5 h-5" />
                   <span>MDA: {results.mda.cp}</span>
+                </div>
+                <div
+                  className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold shadow-md ${getRiskLevelColorFromScore(
+                    results.scores.cp
+                  )}`}
+                >
+                  <span>{getRiskLevelFromScore(results.scores.cp)}</span>
                 </div>
               </div>
             </div>

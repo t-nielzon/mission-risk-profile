@@ -48,7 +48,7 @@ export function MissionDetailsForm({ form, onNext }: MissionDetailsFormProps) {
             </CardTitle>
           </CardHeader>
           <CardContent className="p-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
               <div className="space-y-4">
                 <Label
                   htmlFor="callsign"
@@ -228,7 +228,7 @@ export function MissionDetailsForm({ form, onNext }: MissionDetailsFormProps) {
                 className="text-gray-700 font-semibold flex items-center gap-2"
               >
                 <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                Date & Time
+                Date
               </Label>
               <Input
                 id="date_time"
