@@ -20,10 +20,14 @@ export default function Home() {
   }, [router]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center">
-      <div className="text-center">
-        <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto"></div>
-        <p className="text-gray-600 mt-4">
+    <div
+      className="min-h-screen relative flex items-center justify-center bg-cover bg-center"
+      style={{ backgroundImage: "url('/home_background.jpeg')" }}
+    >
+      <div className="absolute inset-0 bg-gradient-to-br from-slate-900/80 via-blue-900/70 to-slate-900/80"></div>
+      <div className="text-center relative z-10">
+        <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-200 mx-auto"></div>
+        <p className="text-blue-100 mt-4">
           Loading Mission Risk Profile Planner...
         </p>
       </div>

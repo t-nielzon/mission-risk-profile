@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -47,13 +48,13 @@ export function SummaryCard({
   onCommentsChange,
   onBack,
 }: SummaryCardProps) {
+  const router = useRouter();
   const [isExporting, setIsExporting] = useState(false);
   const [isSendingEmail, setIsSendingEmail] = useState(false);
   const [picEmail, setPicEmail] = useState("");
   const [userEmail, setUserEmail] = useState("");
   const [showEmailForm, setShowEmailForm] = useState(false);
   const [exportSuccess, setExportSuccess] = useState(false);
-  const [emailSuccess, setEmailSuccess] = useState(false);
   const [showDetailedAnswers, setShowDetailedAnswers] = useState(false);
 
   const handleExport = async () => {
@@ -95,7 +96,9 @@ export function SummaryCard({
     setIsSendingEmail(true);
     try {
       // Always include p2ltbalangue@gmail.com plus any other emails entered
-      const emails = [picEmail, userEmail, "p2ltbalangue@gmail.com"].filter(Boolean);
+      const emails = [picEmail, userEmail, "p2ltbalangue@gmail.com"].filter(
+        Boolean
+      );
 
       // send email with Word document attachment via API
       const response = await fetch("/api/send-email-with-attachment", {
@@ -105,11 +108,10 @@ export function SummaryCard({
       });
 
       if (response.ok) {
-        setEmailSuccess(true);
         setShowEmailForm(false);
         setPicEmail("");
-        setUserEmail(""); // reset to empty
-        setTimeout(() => setEmailSuccess(false), 3000);
+        setUserEmail("");
+        router.push("/email-sent");
       } else {
         console.error("Email failed:", await response.text());
       }
@@ -192,13 +194,6 @@ export function SummaryCard({
         </div>
       )}
 
-      {emailSuccess && (
-        <div className="bg-blue-100 border border-blue-400 text-blue-700 px-6 py-4 rounded-xl flex items-center gap-3 animate-in slide-in-from-top duration-300">
-          <Mail className="w-6 h-6" />
-          <span className="font-medium">Emails sent successfully!</span>
-        </div>
-      )}
-
       {/* Mission Summary Card */}
       <Card className="bg-gradient-to-br from-blue-50 to-cyan-50 border-blue-200 shadow-xl">
         <CardHeader className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-t-lg">
@@ -222,7 +217,9 @@ export function SummaryCard({
               </p>
             </div>
             <div className="col-span-2 space-y-2">
-              <Label className="text-gray-600 font-medium">Pilot-in-Command</Label>
+              <Label className="text-gray-600 font-medium">
+                Pilot-in-Command
+              </Label>
               <p className="text-lg font-semibold text-gray-700">
                 {formData.missionDetails.pic_name}
               </p>

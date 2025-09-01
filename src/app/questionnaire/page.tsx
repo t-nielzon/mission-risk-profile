@@ -170,15 +170,19 @@ export default function QuestionnairePage() {
   // welcome screen
   if (currentStep === 0) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 flex items-center justify-center p-4 relative overflow-hidden">
+      <div
+        className="min-h-screen relative flex items-center justify-center p-4 overflow-hidden bg-cover bg-center"
+        style={{ backgroundImage: "url('/home_background.jpeg')" }}
+      >
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-900/80 via-blue-900/70 to-indigo-900/80 z-0"></div>
         {/* Animated background */}
-        <div className="absolute inset-0">
+        <div className="absolute inset-0 z-10">
           <div className="absolute top-20 left-20 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl animate-pulse"></div>
           <div className="absolute bottom-20 right-20 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
           <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-indigo-500/5 rounded-full blur-3xl animate-pulse delay-500"></div>
         </div>
 
-        <Card className="w-full max-w-4xl mx-auto bg-white/5 backdrop-blur-xl border-white/10 shadow-2xl relative z-10">
+        <Card className="w-full max-w-4xl mx-auto bg-white/5 backdrop-blur-xl border-white/10 shadow-2xl relative z-20">
           <CardHeader className="text-center pb-8 pt-12">
             {/* Hero section */}
             <div className="mx-auto mb-8 relative">
