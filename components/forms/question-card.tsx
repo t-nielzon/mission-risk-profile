@@ -29,6 +29,8 @@ interface QuestionCardProps {
   onNext: () => void;
   onPrevious: () => void;
   canGoBack: boolean;
+  canReturnToSummary?: boolean;
+  onReturnToSummary?: () => void;
 }
 
 export function QuestionCard({
@@ -40,6 +42,8 @@ export function QuestionCard({
   onNext,
   onPrevious,
   canGoBack,
+  canReturnToSummary,
+  onReturnToSummary,
 }: QuestionCardProps) {
   const [picAnswer, setPicAnswer] = useState<RiskLevel | undefined>(
     answer?.picAnswer
@@ -354,6 +358,16 @@ export function QuestionCard({
                 >
                   <ChevronLeft className="w-5 h-5" />
                   Previous
+                </Button>
+              )}
+              {canReturnToSummary && onReturnToSummary && (
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={onReturnToSummary}
+                  className="flex items-center gap-2 px-6 py-3 rounded-xl bg-white border-2 border-gray-200 hover:bg-gray-100 transition-all duration-300"
+                >
+                  Return to Summary
                 </Button>
               )}
               <Button

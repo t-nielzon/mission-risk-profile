@@ -24,10 +24,12 @@ export async function POST(request: NextRequest) {
       formData,
       results,
       emails,
+      notifyOnly,
     }: {
       formData: MRPFormData;
       results: MRPResults;
       emails: string[];
+      notifyOnly?: boolean;
     } = await request.json();
 
     if (!emails || emails.length === 0) {
@@ -35,6 +37,31 @@ export async function POST(request: NextRequest) {
         { error: "No email addresses provided" },
         { status: 400 }
       );
+    }
+
+    // if notifyOnly is set, send a lightweight notification without attachment
+    if (notifyOnly) {
+      const transporter = nodemailer.createTransport(SMTP_CONFIG);
+      const html = `
+        <div style="font-family: system-ui, Arial;">
+          <h2 style="color:#1e40af;margin:0 0 8px 0;">Assessment confirmed</h2>
+          <p style="margin:0 0 12px 0;color:#374151;">The user has confirmed their answers for mission <strong>${
+            formData?.missionDetails?.callsign || "N/A"
+          }</strong>.</p>
+          <p style="font-size:12px;color:#6b7280;">This is an automated notification.</p>
+        </div>`;
+      const mail = await transporter.sendMail({
+        from: `"Mission Risk Profile System" <${process.env.GMAIL_USER}>`,
+        to: emails.join(", "),
+        subject: `Assessment Confirmed - ${
+          formData?.missionDetails?.callsign || "Mission"
+        }`,
+        html,
+      });
+      return NextResponse.json({
+        message: "Notification sent",
+        messageId: mail.messageId,
+      });
     }
 
     // generate the Word document

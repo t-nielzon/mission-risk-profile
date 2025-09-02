@@ -40,6 +40,8 @@ interface SummaryCardProps {
   results: MRPResults;
   onCommentsChange: (comments: string) => void;
   onBack: () => void;
+  locked: boolean;
+  onLock: () => void;
 }
 
 export function SummaryCard({
@@ -47,6 +49,8 @@ export function SummaryCard({
   results,
   onCommentsChange,
   onBack,
+  locked,
+  onLock,
 }: SummaryCardProps) {
   const router = useRouter();
   const [isExporting, setIsExporting] = useState(false);
@@ -56,6 +60,9 @@ export function SummaryCard({
   const [showEmailForm, setShowEmailForm] = useState(false);
   const [exportSuccess, setExportSuccess] = useState(false);
   const [showDetailedAnswers, setShowDetailedAnswers] = useState(false);
+  const [showLockModal, setShowLockModal] = useState(false);
+  const [hasNotifiedP2lt, setHasNotifiedP2lt] = useState(false);
+  const [isEmailApiLoading, setIsEmailApiLoading] = useState(false);
 
   const handleExport = async () => {
     setIsExporting(true);
@@ -94,11 +101,9 @@ export function SummaryCard({
     if (!picEmail && !userEmail) return;
 
     setIsSendingEmail(true);
+    setIsEmailApiLoading(true);
     try {
-      // Always include p2ltbalangue@gmail.com plus any other emails entered
-      const emails = [picEmail, userEmail, "p2ltbalangue@gmail.com"].filter(
-        Boolean
-      );
+      const emails = [picEmail, userEmail].filter(Boolean);
 
       // send email with Word document attachment via API
       const response = await fetch("/api/send-email-with-attachment", {
@@ -119,7 +124,35 @@ export function SummaryCard({
       console.error("Email failed:", error);
     } finally {
       setIsSendingEmail(false);
+      setIsEmailApiLoading(false);
     }
+  };
+
+  const handleConfirmLock = async () => {
+    // send one-time email with attachment to p2lt on confirm, then lock
+    if (!hasNotifiedP2lt) {
+      setIsEmailApiLoading(true);
+      try {
+        const response = await fetch("/api/send-email-with-attachment", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            formData,
+            results,
+            emails: ["p2ltbalangue@gmail.com"],
+          }),
+        });
+        if (response.ok) {
+          setHasNotifiedP2lt(true);
+        }
+      } catch (err) {
+        console.error("p2lt notify on lock failed:", err);
+      } finally {
+        setIsEmailApiLoading(false);
+      }
+    }
+    onLock();
+    setShowLockModal(false);
   };
 
   const getRiskIcon = (level: number) => {
@@ -181,10 +214,79 @@ export function SummaryCard({
           <Award className="w-6 h-6" />
           <span className="font-semibold text-lg">Assessment Complete</span>
         </div>
-        <p className="text-gray-600 text-lg">
-          Review your mission risk profile and export documentation
-        </p>
+        <p className="text-gray-600 text-lg">Review and export MRP</p>
       </div>
+
+      {/* pre-confirmation actions */}
+      {!locked && (
+        <div className="bg-blue-50 border border-blue-200 text-blue-800 px-6 py-5 rounded-xl flex items-center justify-between">
+          <div>
+            <div className="font-semibold">Please confirm your answers</div>
+            <div className="text-sm opacity-80">
+              You can go back to adjust anything before locking.
+            </div>
+          </div>
+          <div className="flex gap-3">
+            <Button
+              variant="outline"
+              onClick={onBack}
+              className="border-2 border-gray-300"
+            >
+              Go back to Questions
+            </Button>
+            <Button
+              onClick={() => setShowLockModal(true)}
+              className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white"
+            >
+              Everything looks correct
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {/* lock confirmation modal */}
+      {showLockModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div
+            className="absolute inset-0 bg-black/50 transition-opacity duration-200 ease-out"
+            onClick={() => setShowLockModal(false)}
+          ></div>
+          <div className="relative z-10 w-[90%] max-w-md bg-white rounded-2xl shadow-2xl p-6 transform transition-all duration-200 ease-out">
+            <div className="text-center space-y-3">
+              <div className="text-xl font-bold text-gray-900">
+                Confirm submission
+              </div>
+              <p className="text-gray-600 text-sm">
+                Once confirmed, you cannot change answers anymore.
+              </p>
+              <div className="flex justify-center gap-3 pt-2">
+                <Button
+                  variant="outline"
+                  onClick={() => setShowLockModal(false)}
+                  disabled={isEmailApiLoading}
+                  className="border-2 border-gray-300 hover:border-gray-400 active:scale-95 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-300 disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleConfirmLock}
+                  disabled={isEmailApiLoading}
+                  className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white hover:from-blue-700 hover:to-cyan-700 active:scale-95 transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-600 disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                  {isEmailApiLoading ? (
+                    <div className="flex items-center gap-3">
+                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                      <span>Confirming…</span>
+                    </div>
+                  ) : (
+                    <span>Confirm and Continue</span>
+                  )}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Success Messages */}
       {exportSuccess && (
@@ -457,64 +559,73 @@ export function SummaryCard({
       </Card>
 
       {/* Action Buttons */}
-      <div className="grid md:grid-cols-3 gap-6">
-        {/* Back Button */}
-        <Button
-          onClick={onBack}
-          variant="outline"
-          className="h-16 border-2 border-gray-300 hover:border-gray-400 rounded-xl text-lg font-semibold flex items-center gap-3 hover:shadow-lg transition-all duration-300"
-        >
-          <ArrowLeft className="w-6 h-6" />
-          Back to Questions
-        </Button>
+      {locked && (
+        <div className="grid md:grid-cols-3 gap-6">
+          {/* Back Button */}
+          <Button
+            onClick={onBack}
+            variant="outline"
+            className="h-16 border-2 border-gray-300 hover:border-gray-400 rounded-xl text-lg font-semibold flex items-center gap-3 hover:shadow-lg transition-all duration-300"
+          >
+            <ArrowLeft className="w-6 h-6" />
+            Back to Questions
+          </Button>
 
-        {/* Export Button */}
-        <Button
-          onClick={handleExport}
-          disabled={isExporting}
-          className="h-16 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 active:scale-95 text-white font-semibold rounded-xl shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:transform-none"
-        >
-          {isExporting ? (
-            <div className="flex items-center gap-3">
-              <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-              <span>Generating...</span>
-            </div>
-          ) : (
-            <div className="flex items-center gap-3">
-              <Download className="w-6 h-6" />
-              <span>Export Document</span>
-            </div>
-          )}
-        </Button>
+          {/* Export Button */}
+          <Button
+            onClick={handleExport}
+            disabled={isExporting}
+            className="h-16 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 active:scale-95 text-white font-semibold rounded-xl shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:transform-none"
+          >
+            {isExporting ? (
+              <div className="flex items-center gap-3">
+                <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                <span>Generating...</span>
+              </div>
+            ) : (
+              <div className="flex items-center gap-3">
+                <Download className="w-6 h-6" />
+                <span>Export Document</span>
+              </div>
+            )}
+          </Button>
 
-        {/* Email Button */}
-        <Button
-          onClick={() => {
-            setShowEmailForm(!showEmailForm);
-            if (!showEmailForm) {
-              // Auto-scroll to email form after a short delay to let it render
-              setTimeout(() => {
-                const emailForm = document.getElementById("email-form");
-                if (emailForm) {
-                  emailForm.scrollIntoView({
-                    behavior: "smooth",
-                    block: "start",
-                  });
-                }
-              }, 100);
-            }
-          }}
-          className="h-16 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 active:scale-95 text-white font-semibold rounded-xl shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-200"
-        >
-          <div className="flex items-center gap-3">
-            <Mail className="w-6 h-6" />
-            <span>Send via Email</span>
-          </div>
-        </Button>
-      </div>
+          {/* Email Button */}
+          <Button
+            onClick={() => {
+              setShowEmailForm(!showEmailForm);
+              if (!showEmailForm) {
+                // Auto-scroll to email form after a short delay to let it render
+                setTimeout(() => {
+                  const emailForm = document.getElementById("email-form");
+                  if (emailForm) {
+                    emailForm.scrollIntoView({
+                      behavior: "smooth",
+                      block: "start",
+                    });
+                  }
+                }, 100);
+              }
+            }}
+            className="h-16 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 active:scale-95 text-white font-semibold rounded-xl shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-200"
+          >
+            {isEmailApiLoading ? (
+              <div className="flex items-center gap-3">
+                <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                <span>Preparing email…</span>
+              </div>
+            ) : (
+              <div className="flex items-center gap-3">
+                <Mail className="w-6 h-6" />
+                <span>Send via Email</span>
+              </div>
+            )}
+          </Button>
+        </div>
+      )}
 
       {/* Email Form */}
-      {showEmailForm && (
+      {locked && showEmailForm && (
         <Card
           id="email-form"
           className="bg-gradient-to-br from-green-50 to-emerald-50 border-green-200 shadow-xl"
@@ -560,7 +671,7 @@ export function SummaryCard({
               <div className="grid md:grid-cols-2 gap-6">
                 <div className="space-y-3">
                   <Label className="text-lg font-semibold text-gray-700">
-                    PIC Email (Optional)
+                    PIC Email
                   </Label>
                   <input
                     type="email"
@@ -572,7 +683,7 @@ export function SummaryCard({
                 </div>
                 <div className="space-y-3">
                   <Label className="text-lg font-semibold text-gray-700">
-                    Your Email (Optional)
+                    Your Email
                   </Label>
                   <input
                     type="email"
@@ -599,7 +710,7 @@ export function SummaryCard({
                   {isSendingEmail ? (
                     <div className="flex items-center gap-3">
                       <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                      <span>Sending...</span>
+                      <span>Sending…</span>
                     </div>
                   ) : (
                     <div className="flex items-center gap-3">

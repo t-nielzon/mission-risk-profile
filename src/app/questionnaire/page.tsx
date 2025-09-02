@@ -18,6 +18,7 @@ export default function QuestionnairePage() {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(0); // 0 = welcome, 1 = mission details, 2+ = questions, final = summary
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [isLocked, setIsLocked] = useState(false);
 
   const form = useForm<MRPFormData>({
     defaultValues: {
@@ -162,6 +163,12 @@ export default function QuestionnairePage() {
 
   const handleBackToQuestions = () => {
     setCurrentStep(currentQuestionIndex + 2);
+    setIsLocked(false);
+  };
+
+  const handleReturnToSummary = () => {
+    // recompute already happens via form.watch(); ensure we navigate
+    setCurrentStep(navigationState.totalSteps);
   };
 
   const formData = form.watch();
@@ -409,6 +416,8 @@ export default function QuestionnairePage() {
                 onPrevious={handlePreviousQuestion}
                 // onSkip={handleQuestionAnswer}
                 canGoBack={currentQuestionIndex > 0 || currentStep > 2}
+                canReturnToSummary={!isLocked}
+                onReturnToSummary={handleReturnToSummary}
               />
             )}
 
@@ -418,6 +427,8 @@ export default function QuestionnairePage() {
                 results={results}
                 onCommentsChange={handleCommentsChange}
                 onBack={handleBackToQuestions}
+                locked={isLocked}
+                onLock={() => setIsLocked(true)}
               />
             )}
           </div>
